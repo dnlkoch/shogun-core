@@ -30,6 +30,7 @@
         <connection>scm:git:git://github.com/dnlkoch/shogun2.git</connection>
         <developerConnection>scm:git:[fetch=]git://github.com/dnlkoch/shogun2.git[push=]git@github.com:dnlkoch/shogun2.git</developerConnection>
         <url>https://github.com/dnlkoch/shogun2.git</url>
+        <tag>HEAD</tag>
     </scm>
 
     <ciManagement>
