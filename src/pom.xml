@@ -375,7 +375,6 @@
                     <useReleaseProfile>false</useReleaseProfile>
                     <releaseProfiles>release-artifact</releaseProfiles>
                     <goals>deploy</goals>
-                    <indentSize>4</indentSize>
                     <allowTimestampedSnapshots>true</allowTimestampedSnapshots>
                 </configuration>
             </plugin>
