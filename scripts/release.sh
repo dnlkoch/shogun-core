@@ -31,7 +31,9 @@ GITUSERNAME="dnlkoch"
 #    -DnewVersion="$RELEASE_VERSION" \
 #    --file "$POMFILE"
 
-mvn release:clean release:prepare --batch-mode -DreleaseVersion=$RELEASE_VERSION
+mvn -e release:clean
+mvn release:prepare --batch-mode -DreleaseVersion=$RELEASE_VERSION
+mvn release:perform --batch-mode
 
 #mvn -Dusername=$GITUSERNAME release:prepare
 
