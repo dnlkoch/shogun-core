@@ -14,6 +14,8 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.http.Header;
 import org.apache.http.HttpException;
 import org.apache.http.NameValuePair;
+import org.apache.http.auth.Credentials;
+import org.apache.http.auth.UsernamePasswordCredentials;
 import org.apache.http.client.utils.URIBuilder;
 import org.apache.http.entity.ContentType;
 import org.apache.http.message.BasicHeader;
@@ -21,6 +23,7 @@ import org.apache.http.message.BasicNameValuePair;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpHeaders;
 import org.springframework.stereotype.Service;
 
@@ -67,9 +70,7 @@ public class GeoServerInterceptorService {
     /**
      * An array of whitelisted Headers to forward within the Interceptor.
      */
-    private static final String[] FORWARD_REQUEST_HEADER_KEYS = new String[]{
-        HttpHeaders.AUTHORIZATION
-    };
+    private static final String[] FORWARD_REQUEST_HEADER_KEYS = new String[]{};
 
     /**
      * An array of whitelisted Headers to forward within the Interceptor.
@@ -95,6 +96,24 @@ public class GeoServerInterceptorService {
     /**
      *
      */
+    @Value("${geoserver.interceptor.sendCredentials:}")
+    private boolean sendCredentials;
+
+    /**
+     *
+     */
+    @Value("${geoserver.username:}")
+    private String gsUser;
+
+    /**
+     *
+     */
+    @Value("${geoserver.password:}")
+    private String gsPass;
+
+    /**
+     *
+     */
     @Autowired
     OgcMessageDistributor ogcMessageDistributor;
 
@@ -114,6 +133,8 @@ public class GeoServerInterceptorService {
         String path = matcher.group(1);
         WmtsLayerDataSource dataSource = wmtsLayerDataSourceDao.findById(id);
         String baseUrl = dataSource.getUrl();
+
+        // TODO pass credentials AND forwardHeaders
         Response response = HttpUtil.get(baseUrl + "/" + path);
 
         HttpHeaders forwardingHeaders = getResponseHeadersToForward(response.getHeaders());
@@ -519,7 +540,7 @@ public class GeoServerInterceptorService {
      * @throws InterceptorException
      * @throws HttpException
      */
-    public static Response sendRequest(MutableHttpServletRequest request)
+    public Response sendRequest(MutableHttpServletRequest request)
         throws InterceptorException, HttpException {
 
         Response httpResponse = new Response();
@@ -542,11 +563,20 @@ public class GeoServerInterceptorService {
             // append the given request parameters to the base URI
             URI fullRequestUri = getFullRequestURI(requestUri, allQueryParams);
 
+            Credentials credentials = null;
+            if (sendCredentials) {
+                credentials = new UsernamePasswordCredentials(gsUser, gsPass);
+            }
+
             if (getRequest) {
                 // if we're called via GET method
 
                 // perform the request with the given parameters
-                httpResponse = HttpUtil.get(fullRequestUri, requestHeaders);
+                if (sendCredentials) {
+                    httpResponse = HttpUtil.get(fullRequestUri, credentials, requestHeaders);
+                } else {
+                    httpResponse = HttpUtil.get(fullRequestUri, requestHeaders);
+                }
 
             } else if (postRequest) {
                 // if we're called via POST method
@@ -573,11 +603,19 @@ public class GeoServerInterceptorService {
                     }
 
                     // perform the POST request to the URI with queryString and with the given body
-                    httpResponse = HttpUtil.post(requestUri, body, contentType, requestHeaders);
+                    if (sendCredentials) {
+                        httpResponse = HttpUtil.post(requestUri, body, contentType, credentials, requestHeaders);
+                    } else {
+                        httpResponse = HttpUtil.post(requestUri, body, contentType, requestHeaders);
+                    }
                 } else {
 
                     // perform the POST request with the given name value pairs,
-                    httpResponse = HttpUtil.post(requestUri, allQueryParams, requestHeaders);
+                    if (sendCredentials) {
+                        httpResponse = HttpUtil.post(requestUri, allQueryParams, credentials, requestHeaders);
+                    } else {
+                        httpResponse = HttpUtil.post(requestUri, allQueryParams, requestHeaders);
+                    }
                 }
 
             } else {

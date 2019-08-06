@@ -6,9 +6,7 @@ package de.terrestris.shoguncore.util.interceptor.impl;
 import static org.apache.logging.log4j.LogManager.getLogger;
 
 import org.apache.logging.log4j.Logger;
-import org.springframework.beans.factory.annotation.Value;
 
-import de.terrestris.shoguncore.util.interceptor.BasicAuthHeaderRequest;
 import de.terrestris.shoguncore.util.interceptor.MutableHttpServletRequest;
 import de.terrestris.shoguncore.util.interceptor.WfsRequestInterceptorInterface;
 
@@ -29,22 +27,10 @@ public class WfsRequestInterceptor implements WfsRequestInterceptorInterface {
 	/**
 	 *
 	 */
-	@Value("${geoserver.username:}")
-	private String gsUser;
-
-	/**
-	 *
-	 */
-	@Value("${geoserver.password:}")
-	private String gsPass;
-
-	/**
-	 *
-	 */
 	@Override
 	public MutableHttpServletRequest interceptGetCapabilities(MutableHttpServletRequest request) {
-		LOG.debug("Intercepting WFS GetCapabilities and adding Basic auth credentials.");
-		return new BasicAuthHeaderRequest(request, gsUser, gsPass);
+		LOG.debug("Intercepting WFS GetCapabilities.");
+		return request;
 	}
 
 	/**
@@ -52,8 +38,8 @@ public class WfsRequestInterceptor implements WfsRequestInterceptorInterface {
 	 */
 	@Override
 	public MutableHttpServletRequest interceptDescribeFeatureType(MutableHttpServletRequest request) {
-		LOG.debug("Intercepting WFS DescribeFeatureType and adding Basic auth credentials.");
-		return new BasicAuthHeaderRequest(request, gsUser, gsPass);
+		LOG.debug("Intercepting WFS DescribeFeatureType.");
+        return request;
 	}
 
 	/**
@@ -61,8 +47,8 @@ public class WfsRequestInterceptor implements WfsRequestInterceptorInterface {
 	 */
 	@Override
 	public MutableHttpServletRequest interceptGetFeature(MutableHttpServletRequest request) {
-		LOG.debug("Intercepting WFS GetFeature and adding Basic auth credentials.");
-		return new BasicAuthHeaderRequest(request, gsUser, gsPass);
+		LOG.debug("Intercepting WFS GetFeature.");
+        return request;
 	}
 
 	/**
@@ -70,8 +56,8 @@ public class WfsRequestInterceptor implements WfsRequestInterceptorInterface {
 	 */
 	@Override
 	public MutableHttpServletRequest interceptLockFeature(MutableHttpServletRequest request) {
-		LOG.debug("Intercepting WFS LockFeature and adding Basic auth credentials.");
-		return new BasicAuthHeaderRequest(request, gsUser, gsPass);
+		LOG.debug("Intercepting WFS LockFeature.");
+        return request;
 	}
 
 	/**
@@ -79,8 +65,8 @@ public class WfsRequestInterceptor implements WfsRequestInterceptorInterface {
 	 */
 	@Override
 	public MutableHttpServletRequest interceptTransaction(MutableHttpServletRequest request) {
-		LOG.debug("Intercepting WFS Transaction and adding Basic auth credentials.");
-		return new BasicAuthHeaderRequest(request, gsUser, gsPass);
+		LOG.debug("Intercepting WFS Transaction.");
+        return request;
 	}
 
 }
